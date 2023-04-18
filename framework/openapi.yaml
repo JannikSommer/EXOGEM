@@ -1,0 +1,95 @@
+openapi: "3.0.2"
+info:
+  version: 1.0.0
+  title: Process Node Rest Api
+  license: 
+    name: MIT
+servers:
+  - url: https://project.sommersoftware.dk/
+x-monitor-server: https://monitor.sommersoftware.dk/
+paths:
+  /image:
+    post:
+      summary: Post a recognition request
+      operationId: processImage
+      x-monitor: #Marks the operation for monitoring
+        datastructure: MonitorData
+      tags:
+        - Image
+      requestBody:
+        description: Image object for processing
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Image"
+              type: object
+            encoding:
+              image_data:
+                contentType: image/jpg
+      responses:
+        '200':
+          description: Image posted successfully
+          # content:
+          #   application/json:
+          #     schema: 
+          #       $ref: "#/components/schemas/MonitorData"
+
+components:
+  schemas:
+    MonitorData:
+      x-monitor-data:
+        include-time: true
+        include-client-id: true
+      type: object
+      properties:
+        request_id:
+          type: string
+        server_information:
+          type: object
+          $ref: "#/components/schemas/ServerInformation"
+          
+    ServerInformation:
+      type: object
+      properties:
+        received_time:
+          type: string
+          format: date-time
+        answer_time:
+          type: string
+          format: date-time
+        queue_at_arrival:
+          type: integer 
+          format: int32
+        cpu_info:
+          type: number
+          format: float
+        gpu_info:
+          type: number
+          format: float
+        memory_info:
+          type: object
+          $ref: "#/components/schemas/MemoryInformation"
+
+    MemoryInformation:
+      type: object
+      properties:
+        total_memory:
+          type: number
+          format: float
+        used_memory:
+          type: number
+          format: float
+
+    Image:   #Image Object
+      type: object
+      required: 
+        - image_data
+        - location
+      properties: 
+        image_data: 
+          type: string
+          format: base64
+        location:
+          type: string
+          format: utf8

@@ -1,0 +1,72 @@
+openapi: 3.0.2
+info:
+  license:
+    name: MIT
+  title: Monitoring Server Rest Api
+  version: 1.0.0
+servers:
+- url: http://project.sommersoftware.dk/
+paths:
+  /image:
+    post:
+      operationId: process_image
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryInformation'
+        description: Image object for processing
+        required: true
+      responses:
+        default:
+          description: Default response
+      summary: Post a recognition request
+      tags:
+      - Image
+      x-openapi-router-controller: openapi_server.controllers.image_controller
+components:
+  schemas:
+    MonitorData:
+      x-monitor-data:
+        ignore-time: false
+      type: object
+      properties:
+        request_id:
+          type: string
+        client_id:
+          type: string
+        server_information:
+          type: object
+          $ref: "#/components/schemas/ServerInformation"
+          
+    ServerInformation:
+      type: object
+      properties:
+        received_time:
+          type: string
+          format: date-time
+        answer_time:
+          type: string
+          format: date-time
+        queue_at_arrival:
+          type: integer 
+          format: int32
+        cpu_info:
+          type: number
+          format: float
+        gpu_info:
+          type: number
+          format: float
+        memory_info:
+          type: object
+          $ref: "#/components/schemas/MemoryInformation"
+
+    MemoryInformation:
+      type: object
+      properties:
+        total_memory:
+          type: number
+          format: float
+        used_memory:
+          type: number
+          format: float

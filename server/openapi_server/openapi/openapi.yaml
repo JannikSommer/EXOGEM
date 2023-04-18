@@ -1,0 +1,97 @@
+openapi: 3.0.2
+info:
+  license:
+    name: MIT
+  title: EXOGEM
+  version: 1.0.0
+servers:
+- url: https://project.sommersoftware.dk/
+paths:
+  /image:
+    post:
+      operationId: process_image
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding:
+              image_data:
+                contentType: image/jpg
+                style: form
+            schema:
+              $ref: '#/components/schemas/Image'
+        description: Image object for processing
+        required: true
+      responses:
+        "200":
+          description: Image posted successfully
+      summary: Post a recognition request
+      tags:
+      - Image
+      x-monitor:
+        ignore-time: false
+        datastructure: MonitorData
+      x-openapi-router-controller: openapi_server.controllers.image_controller
+components:
+  schemas:
+    MonitorData:
+      properties:
+        request_id:
+          type: string
+        client_id:
+          type: string
+        server_information:
+          $ref: '#/components/schemas/ServerInformation'
+      type: object
+      x-monitor-data:
+        ignore-time: false
+    ServerInformation:
+      properties:
+        received_time:
+          format: date-time
+          title: received_time
+          type: string
+        answer_time:
+          format: date-time
+          title: answer_time
+          type: string
+        queue_at_arrival:
+          format: int32
+          title: queue_at_arrival
+          type: integer
+        cpu_info:
+          format: float
+          title: cpu_info
+          type: number
+        gpu_info:
+          format: float
+          title: gpu_info
+          type: number
+        memory_info:
+          $ref: '#/components/schemas/MemoryInformation'
+      title: ServerInformation
+      type: object
+    MemoryInformation:
+      properties:
+        total_memory:
+          format: float
+          title: total_memory
+          type: number
+        used_memory:
+          format: float
+          title: used_memory
+          type: number
+      title: MemoryInformation
+      type: object
+    Image:
+      properties:
+        location:
+          type: string
+          format: uft8
+        image_data:
+          format: base64
+          type: string
+      required:
+      - location
+      - image_data
+      type: object
+x-monitor-server: http://sw604-monitor.srv.aau.dk/
